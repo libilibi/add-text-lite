@@ -1,0 +1,26 @@
+body {
+    margin: 0;
+    color : #eeeeee;
+    background : #222222;
+}
+
+#text {
+    height: 150px;
+    width: 100%;
+}
+
+#c1 {
+    display: block;
+    margin: auto;
+    max-width: 90%;
+}
+#img_output {
+    display: block;
+    margin: auto;
+    max-width: 90%;
+}
+
+.tool {
+    width: 80%;
+    margin: auto;
+}

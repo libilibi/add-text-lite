@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="stylesheet" href="style.css" type="text/css" />
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="app.js"></script>
+    </head>
+    <body>
+        <div>
+            画像ファイルを選択してください<br/>
+            <input type="file" id="img_file" />
+        </div>
+        <canvas id="c1"></canvas>
+        <div>
+            <img id="img_output" />
+        </div>
+        <div class="tool">
+            <textarea id="text"></textarea>
+            <div>
+                <label for="">テキストの位置</label>
+                <select id="layout">
+                    <option value="overlay">画像に重ねる</option>
+                    <option value="right">画像の右</option>
+                    <option value="bottom">画像の下</option>
+                </select>
+            </div>
+            <div>
+                <label for="">配色</label>
+                <select id="colors">
+                    <option value="purple-purple">紫-紫</option>
+                    <option value="red-black">赤-黒</option>
+                </select>
+            </div>
+        </div>
+    </body>
+</html>
