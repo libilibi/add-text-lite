@@ -21,6 +21,7 @@ $(function() {
 });
 
 var mainImage;
+var scale;
 
 function fileChanged(e) {
     var files = e.target.files;
@@ -30,7 +31,12 @@ function fileChanged(e) {
     
     var image = new Image();
     image.onload = function() {
-        $('#c1').attr('width', image.width).attr('height', image.height);
+        if (image.width < 1000 || image.height < 1000) {
+            scale = 2.0;
+        } else {
+            scale = 1.0;
+        }
+        $('#c1').attr('width', image.width * scale).attr('height', image.height * scale);
         mainImage = image;
         updateCanvas();
     };
@@ -43,18 +49,18 @@ function updateCanvas() {
     }
     
     if ($('#layout').val() == 'overlay') {
-        $('#c1').attr('width', mainImage.width);
-        $('#c1').attr('height', mainImage.height);
+        $('#c1').attr('width', mainImage.width * scale);
+        $('#c1').attr('height', mainImage.height * scale);
     } else if ($('#layout').val() == 'right') {
-        $('#c1').attr('width', mainImage.width * 2);
-        $('#c1').attr('height', mainImage.height);
+        $('#c1').attr('width', mainImage.width * scale * 2);
+        $('#c1').attr('height', mainImage.height * scale);
     } else if ($('#layout').val() == 'bottom') {
-        $('#c1').attr('width', mainImage.width);
-        $('#c1').attr('height', mainImage.height * 2);
+        $('#c1').attr('width', mainImage.width * scale);
+        $('#c1').attr('height', mainImage.height * scale * 2);
     }
     
     var ctx = $('#c1')[0].getContext('2d');
-    var fontSize = Math.floor(mainImage.width / 32);
+    var fontSize = Math.floor(mainImage.width * scale / 32);
     var textX = fontSize / 2;
     var textY = fontSize / 2;
     var shadowOffset = 10;
@@ -68,13 +74,13 @@ function updateCanvas() {
         backgroundColor = 'rgba(0, 0, 0, 0.8)';
     }
     if ($('#layout').val() == 'right') {
-        ctx.drawImage(mainImage, mainImage.width, 0, mainImage.width, mainImage.height);
-        textX = mainImage.width + fontSize / 2;
+        ctx.drawImage(mainImage, mainImage.width * scale, 0, mainImage.width * scale, mainImage.height * scale);
+        textX = mainImage.width * scale + fontSize / 2;
         ctx.fillStyle = backgroundColor;
         ctx.fillRect(mainImage.width, 0, mainImage.width, mainImage.height);
     } else if ($('#layout').val() == 'bottom') {
         ctx.drawImage(mainImage, 0, mainImage.height, mainImage.width, mainImage.height);
-        textY = mainImage.height + fontSize / 2;
+        textY = mainImage.height * scale + fontSize / 2;
         ctx.fillStyle = backgroundColor;
         ctx.fillRect(0, mainImage.height, mainImage.width, mainImage.height);
     }
@@ -93,13 +99,13 @@ function updateCanvas() {
         maxWidth = Math.max(ctx.measureText(lines[i]).width, maxWidth);
     }
     if ($('#layout').val() == 'right') {
-        $('#c1').attr('width', Math.floor(mainImage.width + maxWidth + fontSize * 1.5));
+        $('#c1').attr('width', Math.floor(mainImage.width * scale + maxWidth + fontSize * 1.5));
     } else if ($('#layout').val() == 'bottom') {
-        $('#c1').attr('height', Math.floor(mainImage.height + maxHeight + fontSize * 1.5));
+        $('#c1').attr('height', Math.floor(mainImage.height * scale + maxHeight + fontSize * 1.5));
     }
     
     ctx.clearRect(0, 0, $('#c1').attr('width'), $('#c1').attr('height'));
-    ctx.drawImage(mainImage, 0, 0, mainImage.width, mainImage.height);
+    ctx.drawImage(mainImage, 0, 0, mainImage.width * scale, mainImage.height * scale);
     
     ctx.miterLimit = 2;
     ctx.fillStyle = '#ffffff';
@@ -108,14 +114,14 @@ function updateCanvas() {
     ctx.textBaseline = 'top';
     ctx.strokeStyle = fontFrameColor;
     if ($('#layout').val() == 'right') {
-        ctx.drawImage(mainImage, mainImage.width, 0, mainImage.width, mainImage.height);
-        textX = mainImage.width + fontSize / 2;
+        ctx.drawImage(mainImage, mainImage.width * scale, 0, mainImage.width * scale, mainImage.height * scale);
+        textX = mainImage.width * scale + fontSize / 2;
         ctx.fillStyle = backgroundColor;
-        ctx.fillRect(mainImage.width, 0, mainImage.width, mainImage.height);
+        ctx.fillRect(mainImage.width * scale, 0, mainImage.width * scale, mainImage.height * scale);
     } else if ($('#layout').val() == 'bottom') {
-        ctx.drawImage(mainImage, 0, mainImage.height, mainImage.width, mainImage.height);
+        ctx.drawImage(mainImage, 0, mainImage.height * scale, mainImage.width * scale, mainImage.height * scale);
         ctx.fillStyle = backgroundColor;
-        ctx.fillRect(0, mainImage.height, mainImage.width, mainImage.height);
+        ctx.fillRect(0, mainImage.height * scale, mainImage.width * scale, mainImage.height * scale);
     }
     ctx.fillStyle = '#ffffff';
     
@@ -139,5 +145,10 @@ function updateCanvas() {
 function updateImage() {
     $('#c1').hide();
     $('#img_output').show();
-    $('#img_output').attr('src', $('#c1')[0].toDataURL('image/jpeg'));
+    var img = new Image();
+    img.src = $('#c1')[0].toDataURL('image/png');
+    $('#c2').attr('width', $('#c1').attr('width') / scale).attr('height', $('#c1').attr('height') / scale);
+    var ctx2 = $('#c2')[0].getContext('2d');
+    ctx2.drawImage(img, 0, 0, img.width / scale, img.height / scale);
+    $('#img_output').attr('src', $('#c2')[0].toDataURL('image/jpeg'));
 }
