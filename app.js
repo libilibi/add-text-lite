@@ -18,6 +18,10 @@ $(function() {
         updateCanvas();
         updateImage();
     });
+    $('input[name=orientation]').change(function() {
+        updateCanvas();
+        updateImage();
+    });
 });
 
 var mainImage;
@@ -66,6 +70,11 @@ function updateCanvas() {
     var shadowOffset = 10;
     var fontFrameColor = '#ff0000';
     var backgroundColor = '#000000';
+    
+    if ($('input[name=orientation]:checked').val() == 'portrait') {
+        textX = Math.floor(mainImage.width * scale - fontSize * 1.5);
+    }
+    
     if ($('#colors').val() == 'purple-purple') {
         fontFrameColor = '#7800af';
         backgroundColor = 'rgba(31, 4, 48, 0.8)';
@@ -98,6 +107,14 @@ function updateCanvas() {
     for (let i = 0; i < lines.length; i++) {
         maxWidth = Math.max(ctx.measureText(lines[i]).width, maxWidth);
     }
+    if ($('input[name=orientation]:checked').val() == 'portrait') {
+        maxWidth = lines.length * fontSize * 1.5;
+        
+        for (let i = 0; i < lines.length; i++) {
+            maxHeight = Math.max(lines[i].length * fontSize * 1.1, maxHeight);
+        }
+    }
+    
     if ($('#layout').val() == 'right') {
         $('#c1').attr('width', Math.floor(mainImage.width * scale + maxWidth + fontSize * 1.5));
     } else if ($('#layout').val() == 'bottom') {
@@ -115,7 +132,12 @@ function updateCanvas() {
     ctx.strokeStyle = fontFrameColor;
     if ($('#layout').val() == 'right') {
         ctx.drawImage(mainImage, mainImage.width * scale, 0, mainImage.width * scale, mainImage.height * scale);
-        textX = mainImage.width * scale + fontSize / 2;
+        
+        if ($('input[name=orientation]:checked').val() == 'portrait') {
+            textX = mainImage.width * scale + maxWidth - fontSize / 2;
+        } else {
+            textX = mainImage.width * scale + fontSize / 2;
+        }
         ctx.fillStyle = backgroundColor;
         ctx.fillRect(mainImage.width * scale, 0, mainImage.width * scale, mainImage.height * scale);
     } else if ($('#layout').val() == 'bottom') {
@@ -131,11 +153,19 @@ function updateCanvas() {
         ctx.shadowOffsetX = shadowOffset;
         ctx.shadowOffsetY = shadowOffset;
         
-        ctx.strokeText(lines[i], textX, fontSize * i * 1.5 + textY);
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-        ctx.fillText(lines[i], textX, fontSize * i * 1.5 + textY);
+        if ($('input[name=orientation]:checked').val() == 'portrait') {
+            strokeTextPortrait(ctx, lines[i], fontSize, -fontSize * i * 1.5 + textX, textY);
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            fillTextPortrait(ctx, lines[i], fontSize, -fontSize * i * 1.5 + textX, textY);
+        } else {
+            ctx.strokeText(lines[i], textX, fontSize * i * 1.5 + textY);
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.fillText(lines[i], textX, fontSize * i * 1.5 + textY);
+        }
     }
     
     $('#c1').show();
@@ -151,4 +181,40 @@ function updateImage() {
     var ctx2 = $('#c2')[0].getContext('2d');
     ctx2.drawImage(img, 0, 0, img.width / scale, img.height / scale);
     $('#img_output').attr('src', $('#c2')[0].toDataURL('image/jpeg'));
+}
+
+function strokeTextPortrait(context, text, fontHeight, x, y) {
+    var varticalMargin = 1.1;
+    for (var i = 0; i < text.length; i++) {
+        var c = text.charAt(i);
+        if ('「」ー（）()'.indexOf(c) >= 0) {
+            context.translate(x + fontHeight / 2, y + fontHeight * varticalMargin * i + fontHeight * varticalMargin / 2);
+            context.rotate(Math.PI / 2);
+            context.strokeText(c, -fontHeight / 2, -fontHeight * varticalMargin / 2);
+            context.rotate(-Math.PI / 2);
+            context.translate(-(x + fontHeight / 2), -(y + fontHeight * varticalMargin * i + fontHeight * varticalMargin / 2));
+        } else if ('、。'.indexOf(c) >= 0) {
+            context.strokeText(c, x + fontHeight * varticalMargin / 2, y + fontHeight * i * varticalMargin - fontHeight * varticalMargin / 2);
+        } else {
+            context.strokeText(c, x, y + fontHeight * i * varticalMargin);
+        }
+    }
+}
+
+function fillTextPortrait(context, text, fontHeight, x, y) {
+    var varticalMargin = 1.1;
+    for (var i = 0; i < text.length; i++) {
+        var c = text.charAt(i);
+        if ('「」ー（）()'.indexOf(c) >= 0) {
+            context.translate(x + fontHeight / 2, y + fontHeight * varticalMargin * i + fontHeight * varticalMargin / 2);
+            context.rotate(Math.PI / 2);
+            context.fillText(c, -fontHeight / 2, -fontHeight * varticalMargin / 2);
+            context.rotate(-Math.PI / 2);
+            context.translate(-(x + fontHeight / 2), -(y + fontHeight * varticalMargin * i + fontHeight * varticalMargin / 2));
+        } else if ('、。'.indexOf(c) >= 0) {
+            context.fillText(c, x + fontHeight * varticalMargin / 2, y + fontHeight * i * varticalMargin - fontHeight * varticalMargin / 2);
+        } else {
+            context.fillText(c, x, y + fontHeight * i * varticalMargin);
+        }
+    }
 }
