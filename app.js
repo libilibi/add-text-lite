@@ -187,6 +187,7 @@ function strokeTextPortrait(context, text, fontHeight, x, y) {
     var varticalMargin = 1.1;
     for (var i = 0; i < text.length; i++) {
         var c = text.charAt(i);
+        var w = context.measureText(c);
         if ('「」ー（）()'.indexOf(c) >= 0) {
             context.translate(x + fontHeight / 2, y + fontHeight * varticalMargin * i + fontHeight * varticalMargin / 2);
             context.rotate(Math.PI / 2);
@@ -196,7 +197,7 @@ function strokeTextPortrait(context, text, fontHeight, x, y) {
         } else if ('、。'.indexOf(c) >= 0) {
             context.strokeText(c, x + fontHeight * varticalMargin / 2, y + fontHeight * i * varticalMargin - fontHeight * varticalMargin / 2);
         } else {
-            context.strokeText(c, x, y + fontHeight * i * varticalMargin);
+            context.strokeText(c, x + (fontHeight - w.width) / 2, y + fontHeight * i * varticalMargin);
         }
     }
 }
@@ -205,6 +206,7 @@ function fillTextPortrait(context, text, fontHeight, x, y) {
     var varticalMargin = 1.1;
     for (var i = 0; i < text.length; i++) {
         var c = text.charAt(i);
+        var w = context.measureText(c);
         if ('「」ー（）()'.indexOf(c) >= 0) {
             context.translate(x + fontHeight / 2, y + fontHeight * varticalMargin * i + fontHeight * varticalMargin / 2);
             context.rotate(Math.PI / 2);
@@ -214,7 +216,7 @@ function fillTextPortrait(context, text, fontHeight, x, y) {
         } else if ('、。'.indexOf(c) >= 0) {
             context.fillText(c, x + fontHeight * varticalMargin / 2, y + fontHeight * i * varticalMargin - fontHeight * varticalMargin / 2);
         } else {
-            context.fillText(c, x, y + fontHeight * i * varticalMargin);
+            context.fillText(c, x + (fontHeight - w.width) / 2, y + fontHeight * i * varticalMargin);
         }
     }
 }
